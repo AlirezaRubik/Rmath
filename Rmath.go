@@ -1,4 +1,7 @@
 package Rmath
+//developed by Alireza Alizadeh Aghdam
+//website:https://www.rubikcomputer.ir
+//AlirezaRubik
 import (
 	"fmt"
 	"unsafe"
