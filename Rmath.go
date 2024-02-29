@@ -1,5 +1,4 @@
 package Rmath
-
 //developed by Alireza Alizadeh Aghdam
 //website:https://www.rubikcomputer.ir
 //AlirezaRubik
@@ -7,6 +6,116 @@ import (
 	"fmt"
 	"unsafe"
 )
+type RMath struct {
+	
+}
+const haveArchTan = false
+var _tanP = [...]float64{
+	-1.30936939181383777646e4, // 0xc0c992d8d24f3f38
+	1.15351664838587416140e6,  // 0x413199eca5fc9ddd
+	-1.79565251976484877988e7, // 0xc1711fead3299176
+}
+var _tanQ = [...]float64{
+	1.00000000000000000000e0,
+	1.36812963470692954678e4,  // 0x40cab8a5eeb36572
+	-1.32089234440210967447e6, // 0xc13427bc582abc96
+	2.50083801823357915839e7,  // 0x4177d98fc2ead8ef
+	-5.38695755929454629881e7, // 0xc189afe03cbe5a31
+}
+const haveArchLog1p = false
+
+var mPi4 = [...]uint64{
+	0x0000000000000001,
+	0x45f306dc9c882a53,
+	0xf84eafa3ea69bb81,
+	0xb6c52b3278872083,
+	0xfca2c757bd778ac3,
+	0x6e48dc74849ba5c0,
+	0x0c925dd413a32439,
+	0xfc3bd63962534e7d,
+	0xd1046bea5d768909,
+	0xd338e04d68befc82,
+	0x7323ac7306a673e9,
+	0x3908bf177bf25076,
+	0x3ff12fffbc0b301f,
+	0xde5e2316b414da3e,
+	0xda6cfd9e4f96136e,
+	0x9e8c7ecd3cbfd45a,
+	0xea4f758fd7cbe2f6,
+	0x7a0e73ef14a525d4,
+	0xd7f6bf623f1aba10,
+	0xac06608df8f6d757,
+}
+var _sin = [...]float64{
+	1.58962301576546568060e-10, // 0x3de5d8fd1fd19ccd
+	-2.50507477628578072866e-8, // 0xbe5ae5e5a9291f5d
+	2.75573136213857245213e-6,  // 0x3ec71de3567d48a1
+	-1.98412698295895385996e-4, // 0xbf2a01a019bfdf03
+	8.33333333332211858878e-3,  // 0x3f8111111110f7d0
+	-1.66666666666666307295e-1, // 0xbfc5555555555548
+}
+
+// cos coefficients
+var _cos = [...]float64{
+	-1.13585365213876817300e-11, // 0xbda8fa49a0861a9b
+	2.08757008419747316778e-9,   // 0x3e21ee9d7b4e3f05
+	-2.75573141792967388112e-7,  // 0xbe927e4f7eac4bc6
+	2.48015872888517045348e-5,   // 0x3efa01a019c844f5
+	-1.38888888888730564116e-3,  // 0xbf56c16c16c14f91
+	4.16666666666665929218e-2,   // 0x3fa555555555554b
+}
+
+const (
+	haveArchAcos = false
+	haveArchSin = false
+	reduceThreshold = 1 << 29
+	haveArchAsinh = false
+	uvnan    = 0x7FF8000000000001
+	uvinf    = 0x7FF0000000000000
+	uvneginf = 0xFFF0000000000000
+	uvone    = 0x3FF0000000000000
+	mask     = 0x7FF
+	shift    = 64 - 11 - 1
+	bias     = 1023
+	signMask = 1 << 63
+	fracMask = 1<<shift - 1
+	MaxFloat32             = 0x1p127 * (1 + (1 - 0x1p-23)) 
+	SmallestNonzeroFloat32 = 0x1p-126 * 0x1p-23            
+	E   = 2.71828182845904523536028747135266249775724709369995957496696763 
+	Pi  = 3.14159265358979323846264338327950288419716939937510582097494459 
+	Phi = 1.61803398874989484820458683436563811772030917980576286213544862 
+	Sqrt2   = 1.41421356237309504880168872420969807856967187537694807317667974 // https://oeis.org/A002193
+	SqrtE   = 1.64872127070012814684865078781416357165377610071014801157507931 // https://oeis.org/A019774
+	SqrtPi  = 1.77245385090551602729816748334114518279754945612238712821380779 // https://oeis.org/A002161
+	SqrtPhi = 1.27201964951406896425242246173749149171560804184009624861664038 // https://oeis.org/A139339
+	Ln2    = 0.693147180559945309417232121458176568075500134360255254120680009 // https://oeis.org/A002162
+	Log2E  = 1 / Ln2
+	Ln10   = 2.30258509299404568401799145468436420760110148862877297603332790 // https://oeis.org/A002392
+	Log10E = 1 / Ln10
+	MaxFloat64             = 0x1p1023 * (1 + (1 - 0x1p-52)) // 1.79769313486231570814527423731704356798070e+308
+	SmallestNonzeroFloat64 = 0x1p-1022 * 0x1p-52            // 4.9406564584124654417656879286822137236505980e-324
+)
+const (
+	Sqrt2M1     = 4.142135623730950488017e-01  // Sqrt(2)-1 = 0x3fda827999fcef34
+	Sqrt2HalfM1 = -2.928932188134524755992e-01 // Sqrt(2)/2-1 = 0xbfd2bec333018866
+	Small       = 1.0 / (1 << 29)              // 2**-29 = 0x3e20000000000000
+	Tiny        = 1.0 / (1 << 54)              // 2**-54
+	Two53       = 1 << 53                      // 2**53
+	Ln2Hi       = 6.93147180369123816490e-01   // 3fe62e42fee00000
+	Ln2Lo       = 1.90821492927058770002e-10   // 3dea39ef35793c76
+	Lp1         = 6.666666666666735130e-01     // 3FE5555555555593
+	Lp2         = 3.999999999940941908e-01     // 3FD999999997FA04
+	Lp3         = 2.857142874366239149e-01     // 3FD2492494229359
+	Lp4         = 2.222219843214978396e-01     // 3FCC71C51D8E78AF
+	Lp5         = 1.818357216161805012e-01     // 3FC7466496CB03DE
+	Lp6         = 1.531383769920937332e-01     // 3FC39A09D078C69F
+	Lp7         = 1.479819860511658591e-01     // 3FC2F112DF3E5244
+)
+const m0 = 0x5555555555555555 // 01010101 ...
+const m1 = 0x3333333333333333 // 00110011 ...
+const m2 = 0x0f0f0f0f0f0f0f0f // 00001111 ...
+const m3 = 0x00ff00ff00ff00ff // etc.
+const m4 = 0x0000ffff0000ffff
 const ntz8tab = "" +
 	"\x08\x00\x01\x00\x02\x00\x01\x00\x03\x00\x01\x00\x02\x00\x01\x00" +
 	"\x04\x00\x01\x00\x02\x00\x01\x00\x03\x00\x01\x00\x02\x00\x01\x00" +
@@ -80,6 +189,263 @@ const len8tab = "" +
 	"\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08"
 
 const uintSize = 32 << (^uint(0) >> 63) // 32 or 64
+// ArbitraryType is here for the purposes of documentation only and is not actually
+// part of the unsafe package. It represents the type of an arbitrary Go expression.
+type ArbitraryType int
+
+// IntegerType is here for the purposes of documentation only and is not actually
+// part of the unsafe package. It represents any arbitrary integer type.
+type IntegerType int
+
+// Pointer represents a pointer to an arbitrary type. There are four special operations
+// available for type Pointer that are not available for other types:
+//   - A pointer value of any type can be converted to a Pointer.
+//   - A Pointer can be converted to a pointer value of any type.
+//   - A uintptr can be converted to a Pointer.
+//   - A Pointer can be converted to a uintptr.
+//
+// Pointer therefore allows a program to defeat the type system and read and write
+// arbitrary memory. It should be used with extreme care.
+//
+// The following patterns involving Pointer are valid.
+// Code not using these patterns is likely to be invalid today
+// or to become invalid in the future.
+// Even the valid patterns below come with important caveats.
+//
+// Running "go vet" can help find uses of Pointer that do not conform to these patterns,
+// but silence from "go vet" is not a guarantee that the code is valid.
+//
+// (1) Conversion of a *T1 to Pointer to *T2.
+//
+// Provided that T2 is no larger than T1 and that the two share an equivalent
+// memory layout, this conversion allows reinterpreting data of one type as
+// data of another type. An example is the implementation of
+// math.Float64bits:
+//
+//	func Float64bits(f float64) uint64 {
+//		return *(*uint64)(unsafe.Pointer(&f))
+//	}
+//
+// (2) Conversion of a Pointer to a uintptr (but not back to Pointer).
+//
+// Converting a Pointer to a uintptr produces the memory address of the value
+// pointed at, as an integer. The usual use for such a uintptr is to print it.
+//
+// Conversion of a uintptr back to Pointer is not valid in general.
+//
+// A uintptr is an integer, not a reference.
+// Converting a Pointer to a uintptr creates an integer value
+// with no pointer semantics.
+// Even if a uintptr holds the address of some object,
+// the garbage collector will not update that uintptr's value
+// if the object moves, nor will that uintptr keep the object
+// from being reclaimed.
+//
+// The remaining patterns enumerate the only valid conversions
+// from uintptr to Pointer.
+//
+// (3) Conversion of a Pointer to a uintptr and back, with arithmetic.
+//
+// If p points into an allocated object, it can be advanced through the object
+// by conversion to uintptr, addition of an offset, and conversion back to Pointer.
+//
+//	p = unsafe.Pointer(uintptr(p) + offset)
+//
+// The most common use of this pattern is to access fields in a struct
+// or elements of an array:
+//
+//	// equivalent to f := unsafe.Pointer(&s.f)
+//	f := unsafe.Pointer(uintptr(unsafe.Pointer(&s)) + unsafe.Offsetof(s.f))
+//
+//	// equivalent to e := unsafe.Pointer(&x[i])
+//	e := unsafe.Pointer(uintptr(unsafe.Pointer(&x[0])) + i*unsafe.Sizeof(x[0]))
+//
+// It is valid both to add and to subtract offsets from a pointer in this way.
+// It is also valid to use &^ to round pointers, usually for alignment.
+// In all cases, the result must continue to point into the original allocated object.
+//
+// Unlike in C, it is not valid to advance a pointer just beyond the end of
+// its original allocation:
+//
+//	// INVALID: end points outside allocated space.
+//	var s thing
+//	end = unsafe.Pointer(uintptr(unsafe.Pointer(&s)) + unsafe.Sizeof(s))
+//
+//	// INVALID: end points outside allocated space.
+//	b := make([]byte, n)
+//	end = unsafe.Pointer(uintptr(unsafe.Pointer(&b[0])) + uintptr(n))
+//
+// Note that both conversions must appear in the same expression, with only
+// the intervening arithmetic between them:
+//
+//	// INVALID: uintptr cannot be stored in variable
+//	// before conversion back to Pointer.
+//	u := uintptr(p)
+//	p = unsafe.Pointer(u + offset)
+//
+// Note that the pointer must point into an allocated object, so it may not be nil.
+//
+//	// INVALID: conversion of nil pointer
+//	u := unsafe.Pointer(nil)
+//	p := unsafe.Pointer(uintptr(u) + offset)
+//
+// (4) Conversion of a Pointer to a uintptr when calling syscall.Syscall.
+//
+// The Syscall functions in package syscall pass their uintptr arguments directly
+// to the operating system, which then may, depending on the details of the call,
+// reinterpret some of them as pointers.
+// That is, the system call implementation is implicitly converting certain arguments
+// back from uintptr to pointer.
+//
+// If a pointer argument must be converted to uintptr for use as an argument,
+// that conversion must appear in the call expression itself:
+//
+//	syscall.Syscall(SYS_READ, uintptr(fd), uintptr(unsafe.Pointer(p)), uintptr(n))
+//
+// The compiler handles a Pointer converted to a uintptr in the argument list of
+// a call to a function implemented in assembly by arranging that the referenced
+// allocated object, if any, is retained and not moved until the call completes,
+// even though from the types alone it would appear that the object is no longer
+// needed during the call.
+//
+// For the compiler to recognize this pattern,
+// the conversion must appear in the argument list:
+//
+//	// INVALID: uintptr cannot be stored in variable
+//	// before implicit conversion back to Pointer during system call.
+//	u := uintptr(unsafe.Pointer(p))
+//	syscall.Syscall(SYS_READ, uintptr(fd), u, uintptr(n))
+//
+// (5) Conversion of the result of reflect.Value.Pointer or reflect.Value.UnsafeAddr
+// from uintptr to Pointer.
+//
+// Package reflect's Value methods named Pointer and UnsafeAddr return type uintptr
+// instead of unsafe.Pointer to keep callers from changing the result to an arbitrary
+// type without first importing "unsafe". However, this means that the result is
+// fragile and must be converted to Pointer immediately after making the call,
+// in the same expression:
+//
+//	p := (*int)(unsafe.Pointer(reflect.ValueOf(new(int)).Pointer()))
+//
+// As in the cases above, it is invalid to store the result before the conversion:
+//
+//	// INVALID: uintptr cannot be stored in variable
+//	// before conversion back to Pointer.
+//	u := reflect.ValueOf(new(int)).Pointer()
+//	p := (*int)(unsafe.Pointer(u))
+//
+// (6) Conversion of a reflect.SliceHeader or reflect.StringHeader Data field to or from Pointer.
+//
+// As in the previous case, the reflect data structures SliceHeader and StringHeader
+// declare the field Data as a uintptr to keep callers from changing the result to
+// an arbitrary type without first importing "unsafe". However, this means that
+// SliceHeader and StringHeader are only valid when interpreting the content
+// of an actual slice or string value.
+//
+//	var s string
+//	hdr := (*reflect.StringHeader)(unsafe.Pointer(&s)) // case 1
+//	hdr.Data = uintptr(unsafe.Pointer(p))              // case 6 (this case)
+//	hdr.Len = n
+//
+// In this usage hdr.Data is really an alternate way to refer to the underlying
+// pointer in the string header, not a uintptr variable itself.
+//
+// In general, reflect.SliceHeader and reflect.StringHeader should be used
+// only as *reflect.SliceHeader and *reflect.StringHeader pointing at actual
+// slices or strings, never as plain structs.
+// A program should not declare or allocate variables of these struct types.
+//
+//	// INVALID: a directly-declared header will not hold Data as a reference.
+//	var hdr reflect.StringHeader
+//	hdr.Data = uintptr(unsafe.Pointer(p))
+//	hdr.Len = n
+//	s := *(*string)(unsafe.Pointer(&hdr)) // p possibly already lost
+type Pointer *ArbitraryType
+
+// Sizeof takes an expression x of any type and returns the size in bytes
+// of a hypothetical variable v as if v was declared via var v = x.
+// The size does not include any memory possibly referenced by x.
+// For instance, if x is a slice, Sizeof returns the size of the slice
+// descriptor, not the size of the memory referenced by the slice.
+// For a struct, the size includes any padding introduced by field alignment.
+// The return value of Sizeof is a Go constant if the type of the argument x
+// does not have variable size.
+// (A type has variable size if it is a type parameter or if it is an array
+// or struct type with elements of variable size).
+func Sizeof(x ArbitraryType) uintptr
+
+// Offsetof returns the offset within the struct of the field represented by x,
+// which must be of the form structValue.field. In other words, it returns the
+// number of bytes between the start of the struct and the start of the field.
+// The return value of Offsetof is a Go constant if the type of the argument x
+// does not have variable size.
+// (See the description of [Sizeof] for a definition of variable sized types.)
+func Offsetof(x ArbitraryType) uintptr
+
+// Alignof takes an expression x of any type and returns the required alignment
+// of a hypothetical variable v as if v was declared via var v = x.
+// It is the largest value m such that the address of v is always zero mod m.
+// It is the same as the value returned by reflect.TypeOf(x).Align().
+// As a special case, if a variable s is of struct type and f is a field
+// within that struct, then Alignof(s.f) will return the required alignment
+// of a field of that type within a struct. This case is the same as the
+// value returned by reflect.TypeOf(s.f).FieldAlign().
+// The return value of Alignof is a Go constant if the type of the argument
+// does not have variable size.
+// (See the description of [Sizeof] for a definition of variable sized types.)
+func Alignof(x ArbitraryType) uintptr
+
+// The function Add adds len to ptr and returns the updated pointer
+// Pointer(uintptr(ptr) + uintptr(len)).
+// The len argument must be of integer type or an untyped constant.
+// A constant len argument must be representable by a value of type int;
+// if it is an untyped constant it is given type int.
+// The rules for valid uses of Pointer still apply.
+func Add(ptr Pointer, len IntegerType) Pointer
+
+// The function Slice returns a slice whose underlying array starts at ptr
+// and whose length and capacity are len.
+// Slice(ptr, len) is equivalent to
+//
+//	(*[len]ArbitraryType)(unsafe.Pointer(ptr))[:]
+//
+// except that, as a special case, if ptr is nil and len is zero,
+// Slice returns nil.
+//
+// The len argument must be of integer type or an untyped constant.
+// A constant len argument must be non-negative and representable by a value of type int;
+// if it is an untyped constant it is given type int.
+// At run time, if len is negative, or if ptr is nil and len is not zero,
+// a run-time panic occurs.
+func Slice(ptr *ArbitraryType, len IntegerType) []ArbitraryType
+
+// SliceData returns a pointer to the underlying array of the argument
+// slice.
+//   - If cap(slice) > 0, SliceData returns &slice[:1][0].
+//   - If slice == nil, SliceData returns nil.
+//   - Otherwise, SliceData returns a non-nil pointer to an
+//     unspecified memory address.
+func SliceData(slice []ArbitraryType) *ArbitraryType
+
+// String returns a string value whose underlying bytes
+// start at ptr and whose length is len.
+//
+// The len argument must be of integer type or an untyped constant.
+// A constant len argument must be non-negative and representable by a value of type int;
+// if it is an untyped constant it is given type int.
+// At run time, if len is negative, or if ptr is nil and len is not zero,
+// a run-time panic occurs.
+//
+// Since Go strings are immutable, the bytes passed to String
+// must not be modified afterwards.
+func String(ptr *byte, len IntegerType) string
+
+// StringData returns a pointer to the underlying bytes of str.
+// For an empty string the return value is unspecified, and may be nil.
+//
+// Since Go strings are immutable, the bytes returned by StringData
+// must not be modified.
+func StringData(str string) *byte
 
 // UintSize is the size of a uint in bits.
 const UintSize = uintSize
@@ -87,19 +453,19 @@ const UintSize = uintSize
 // --- LeadingZeros ---
 
 // LeadingZeros returns the number of leading zero bits in x; the result is UintSize for x == 0.
-func LeadingZeros(x uint) int { return UintSize - Len(x) }
+func (math *RMath) LeadingZeros(x uint) int { return UintSize - math.Len(x) }
 
 // LeadingZeros8 returns the number of leading zero bits in x; the result is 8 for x == 0.
-func LeadingZeros8(x uint8) int { return 8 - Len8(x) }
+func (math *RMath)LeadingZeros8(x uint8) int { return 8 - math.Len8(x) }
 
 // LeadingZeros16 returns the number of leading zero bits in x; the result is 16 for x == 0.
-func LeadingZeros16(x uint16) int { return 16 - Len16(x) }
+func (math *RMath)LeadingZeros16(x uint16) int { return 16 - math.Len16(x) }
 
 // LeadingZeros32 returns the number of leading zero bits in x; the result is 32 for x == 0.
-func LeadingZeros32(x uint32) int { return 32 - Len32(x) }
+func (math *RMath) LeadingZeros32(x uint32) int { return 32 - math.Len32(x) }
 
 // LeadingZeros64 returns the number of leading zero bits in x; the result is 64 for x == 0.
-func LeadingZeros64(x uint64) int { return 64 - Len64(x) }
+func   (math *RMath)LeadingZeros64(x uint64) int { return 64 - math.Len64(x) }
 
 // --- TrailingZeros ---
 
@@ -121,20 +487,20 @@ var deBruijn64tab = [64]byte{
 }
 
 // TrailingZeros returns the number of trailing zero bits in x; the result is UintSize for x == 0.
-func TrailingZeros(x uint) int {
+func  (math *RMath) TrailingZeros(x uint) int {
 	if UintSize == 32 {
-		return TrailingZeros32(uint32(x))
+		return math.TrailingZeros32(uint32(x))
 	}
-	return TrailingZeros64(uint64(x))
+	return math.TrailingZeros64(uint64(x))
 }
 
 // TrailingZeros8 returns the number of trailing zero bits in x; the result is 8 for x == 0.
-func TrailingZeros8(x uint8) int {
+func   (math *RMath) TrailingZeros8(x uint8) int {
 	return int(ntz8tab[x])
 }
 
 // TrailingZeros16 returns the number of trailing zero bits in x; the result is 16 for x == 0.
-func TrailingZeros16(x uint16) int {
+func  (math *RMath) TrailingZeros16(x uint16) int {
 	if x == 0 {
 		return 16
 	}
@@ -143,7 +509,7 @@ func TrailingZeros16(x uint16) int {
 }
 
 // TrailingZeros32 returns the number of trailing zero bits in x; the result is 32 for x == 0.
-func TrailingZeros32(x uint32) int {
+func  (math *RMath) TrailingZeros32(x uint32) int {
 	if x == 0 {
 		return 32
 	}
@@ -152,7 +518,7 @@ func TrailingZeros32(x uint32) int {
 }
 
 // TrailingZeros64 returns the number of trailing zero bits in x; the result is 64 for x == 0.
-func TrailingZeros64(x uint64) int {
+func  (math *RMath) TrailingZeros64(x uint64) int {
 	if x == 0 {
 		return 64
 	}
@@ -161,37 +527,33 @@ func TrailingZeros64(x uint64) int {
 
 // --- OnesCount ---
 
-const m0 = 0x5555555555555555 // 01010101 ...
-const m1 = 0x3333333333333333 // 00110011 ...
-const m2 = 0x0f0f0f0f0f0f0f0f // 00001111 ...
-const m3 = 0x00ff00ff00ff00ff // etc.
-const m4 = 0x0000ffff0000ffff
+
 
 // OnesCount returns the number of one bits ("population count") in x.
-func OnesCount(x uint) int {
+func (math *RMath)OnesCount(x uint) int {
 	if UintSize == 32 {
-		return OnesCount32(uint32(x))
+		return math.OnesCount32(uint32(x))
 	}
-	return OnesCount64(uint64(x))
+	return math.OnesCount64(uint64(x))
 }
 
 // OnesCount8 returns the number of one bits ("population count") in x.
-func OnesCount8(x uint8) int {
+func (math *RMath)OnesCount8(x uint8) int {
 	return int(pop8tab[x])
 }
 
 // OnesCount16 returns the number of one bits ("population count") in x.
-func OnesCount16(x uint16) int {
+func (math *RMath)OnesCount16(x uint16) int {
 	return int(pop8tab[x>>8] + pop8tab[x&0xff])
 }
 
 // OnesCount32 returns the number of one bits ("population count") in x.
-func OnesCount32(x uint32) int {
+func (math *RMath) OnesCount32(x uint32) int {
 	return int(pop8tab[x>>24] + pop8tab[x>>16&0xff] + pop8tab[x>>8&0xff] + pop8tab[x&0xff])
 }
 
 // OnesCount64 returns the number of one bits ("population count") in x.
-func OnesCount64(x uint64) int {
+func (math *RMath) OnesCount64(x uint64) int {
 	const m = 1<<64 - 1
 	x = x>>1&(m0&m) + x&(m0&m)
 	x = x>>2&(m1&m) + x&(m1&m)
@@ -207,17 +569,17 @@ func OnesCount64(x uint64) int {
 // RotateLeft returns the value of x rotated left by (k mod UintSize) bits.
 // To rotate x right by k bits, call RotateLeft(x, -k).
 // This function's execution time does not depend on the inputs.
-func RotateLeft(x uint, k int) uint {
+func (math *RMath)RotateLeft(x uint, k int) uint {
 	if UintSize == 32 {
-		return uint(RotateLeft32(uint32(x), k))
+		return uint(math.RotateLeft32(uint32(x), k))
 	}
-	return uint(RotateLeft64(uint64(x), k))
+	return uint(math.RotateLeft64(uint64(x), k))
 }
 
 // RotateLeft8 returns the value of x rotated left by (k mod 8) bits.
 // To rotate x right by k bits, call RotateLeft8(x, -k).
 // This function's execution time does not depend on the inputs.
-func RotateLeft8(x uint8, k int) uint8 {
+func (math *RMath) RotateLeft8(x uint8, k int) uint8 {
 	const n = 8
 	s := uint(k) & (n - 1)
 	return x<<s | x>>(n-s)
@@ -226,7 +588,7 @@ func RotateLeft8(x uint8, k int) uint8 {
 // RotateLeft16 returns the value of x rotated left by (k mod 16) bits.
 // To rotate x right by k bits, call RotateLeft16(x, -k).
 // This function's execution time does not depend on the inputs.
-func RotateLeft16(x uint16, k int) uint16 {
+func (math *RMath) RotateLeft16(x uint16, k int) uint16 {
 	const n = 16
 	s := uint(k) & (n - 1)
 	return x<<s | x>>(n-s)
@@ -235,7 +597,7 @@ func RotateLeft16(x uint16, k int) uint16 {
 // RotateLeft32 returns the value of x rotated left by (k mod 32) bits.
 // To rotate x right by k bits, call RotateLeft32(x, -k).
 // This function's execution time does not depend on the inputs.
-func RotateLeft32(x uint32, k int) uint32 {
+func (math *RMath)RotateLeft32(x uint32, k int) uint32 {
 	const n = 32
 	s := uint(k) & (n - 1)
 	return x<<s | x>>(n-s)
@@ -244,7 +606,7 @@ func RotateLeft32(x uint32, k int) uint32 {
 // RotateLeft64 returns the value of x rotated left by (k mod 64) bits.
 // To rotate x right by k bits, call RotateLeft64(x, -k).
 // This function's execution time does not depend on the inputs.
-func RotateLeft64(x uint64, k int) uint64 {
+func (math *RMath) RotateLeft64(x uint64, k int) uint64 {
 	const n = 64
 	s := uint(k) & (n - 1)
 	return x<<s | x>>(n-s)
@@ -252,38 +614,38 @@ func RotateLeft64(x uint64, k int) uint64 {
 
 // --- Reverse ---
 // Reverse returns the value of x with its bits in reversed order.
-func Reverse(x uint) uint {
+func (math *RMath)Reverse(x uint) uint {
 	if UintSize == 32 {
-		return uint(Reverse32(uint32(x)))
+		return uint(math.Reverse32(uint32(x)))
 	}
-	return uint(Reverse64(uint64(x)))
+	return uint(math.Reverse64(uint64(x)))
 }
 
 // Reverse8 returns the value of x with its bits in reversed order.
-func Reverse8(x uint8) uint8 {
+func (math *RMath) Reverse8(x uint8) uint8 {
 	return rev8tab[x]
 }
 // Reverse16 returns the value of x with its bits in reversed order.
-func Reverse16(x uint16) uint16 {
+func (math *RMath)Reverse16(x uint16) uint16 {
 	return uint16(rev8tab[x>>8]) | uint16(rev8tab[x&0xff])<<8
 }
 
 // Reverse32 returns the value of x with its bits in reversed order.
-func Reverse32(x uint32) uint32 {
+func (math *RMath)Reverse32(x uint32) uint32 {
 	const m = 1<<32 - 1
 	x = x>>1&(m0&m) | x&(m0&m)<<1
 	x = x>>2&(m1&m) | x&(m1&m)<<2
 	x = x>>4&(m2&m) | x&(m2&m)<<4
-	return ReverseBytes32(x)
+	return math.ReverseBytes32(x)
 }
 
 // Reverse64 returns the value of x with its bits in reversed order.
-func Reverse64(x uint64) uint64 {
+func (math *RMath)Reverse64(x uint64) uint64 {
 	const m = 1<<64 - 1
 	x = x>>1&(m0&m) | x&(m0&m)<<1
 	x = x>>2&(m1&m) | x&(m1&m)<<2
 	x = x>>4&(m2&m) | x&(m2&m)<<4
-	return ReverseBytes64(x)
+	return math.ReverseBytes64(x)
 }
 
 // --- ReverseBytes ---
@@ -291,24 +653,24 @@ func Reverse64(x uint64) uint64 {
 // ReverseBytes returns the value of x with its bytes in reversed order.
 //
 // This function's execution time does not depend on the inputs.
-func ReverseBytes(x uint) uint {
+func (math *RMath) ReverseBytes(x uint) uint {
 	if UintSize == 32 {
-		return uint(ReverseBytes32(uint32(x)))
+		return uint(math.ReverseBytes32(uint32(x)))
 	}
-	return uint(ReverseBytes64(uint64(x)))
+	return uint(math.ReverseBytes64(uint64(x)))
 }
 
 // ReverseBytes16 returns the value of x with its bytes in reversed order.
 //
 // This function's execution time does not depend on the inputs.
-func ReverseBytes16(x uint16) uint16 {
+func (math *RMath) ReverseBytes16(x uint16) uint16 {
 	return x>>8 | x<<8
 }
 
 // ReverseBytes32 returns the value of x with its bytes in reversed order.
 //
 // This function's execution time does not depend on the inputs.
-func ReverseBytes32(x uint32) uint32 {
+func (math *RMath) ReverseBytes32(x uint32) uint32 {
 	const m = 1<<32 - 1
 	x = x>>8&(m3&m) | x&(m3&m)<<8
 	return x>>16 | x<<16
@@ -317,7 +679,7 @@ func ReverseBytes32(x uint32) uint32 {
 // ReverseBytes64 returns the value of x with its bytes in reversed order.
 //
 // This function's execution time does not depend on the inputs.
-func ReverseBytes64(x uint64) uint64 {
+func (math *RMath) ReverseBytes64(x uint64) uint64 {
 	const m = 1<<64 - 1
 	x = x>>8&(m3&m) | x&(m3&m)<<8
 	x = x>>16&(m4&m) | x&(m4&m)<<16
@@ -327,20 +689,20 @@ func ReverseBytes64(x uint64) uint64 {
 // --- Len ---
 
 // Len returns the minimum number of bits required to represent x; the result is 0 for x == 0.
-func Len(x uint) int {
+func (math *RMath) Len(x uint) int {
 	if UintSize == 32 {
-		return Len32(uint32(x))
+		return math.Len32(uint32(x))
 	}
-	return Len64(uint64(x))
+	return math.Len64(uint64(x))
 }
 
 // Len8 returns the minimum number of bits required to represent x; the result is 0 for x == 0.
-func Len8(x uint8) int {
+func (math *RMath) Len8(x uint8) int {
 	return int(len8tab[x])
 }
 
 // Len16 returns the minimum number of bits required to represent x; the result is 0 for x == 0.
-func Len16(x uint16) (n int) {
+func (math *RMath) Len16(x uint16) (n int) {
 	if x >= 1<<8 {
 		x >>= 8
 		n = 8
@@ -349,7 +711,7 @@ func Len16(x uint16) (n int) {
 }
 
 // Len32 returns the minimum number of bits required to represent x; the result is 0 for x == 0.
-func Len32(x uint32) (n int) {
+func (math *RMath) Len32(x uint32) (n int) {
 	if x >= 1<<16 {
 		x >>= 16
 		n = 16
@@ -362,7 +724,7 @@ func Len32(x uint32) (n int) {
 }
 
 // Len64 returns the minimum number of bits required to represent x; the result is 0 for x == 0.
-func Len64(x uint64) (n int) {
+func   (math *RMath) Len64(x uint64) (n int) {
 	if x >= 1<<32 {
 		x >>= 32
 		n = 32
@@ -382,12 +744,12 @@ func Len64(x uint64) (n int) {
 // The carryOut output is guaranteed to be 0 or 1.
 //
 // This function's execution time does not depend on the inputs.
-func Add(x, y, carry uint) (sum, carryOut uint) {
+func (math *RMath) Add(x, y, carry uint) (sum, carryOut uint) {
 	if UintSize == 32 {
-		s32, c32 := Add32(uint32(x), uint32(y), uint32(carry))
+		s32, c32 := math.Add32(uint32(x), uint32(y), uint32(carry))
 		return uint(s32), uint(c32)
 	}
-	s64, c64 := Add64(uint64(x), uint64(y), uint64(carry))
+	s64, c64 := math. Add64(uint64(x), uint64(y), uint64(carry))
 	return uint(s64), uint(c64)
 }
 
@@ -395,7 +757,7 @@ func Add(x, y, carry uint) (sum, carryOut uint) {
 // The carry input must be 0 or 1; otherwise the behavior is undefined.
 // The carryOut output is guaranteed to be 0 or 1.
 // This function's execution time does not depend on the inputs.
-func Add32(x, y, carry uint32) (sum, carryOut uint32) {
+func (math *RMath)Add32(x, y, carry uint32) (sum, carryOut uint32) {
 	sum64 := uint64(x) + uint64(y) + uint64(carry)
 	sum = uint32(sum64)
 	carryOut = uint32(sum64 >> 32)
@@ -406,7 +768,7 @@ func Add32(x, y, carry uint32) (sum, carryOut uint32) {
 // The carry input must be 0 or 1; otherwise the behavior is undefined.
 // The carryOut output is guaranteed to be 0 or 1.
 // This function's execution time does not depend on the inputs.
-func Add64(x, y, carry uint64) (sum, carryOut uint64) {
+func (math *RMath)Add64(x, y, carry uint64) (sum, carryOut uint64) {
 	sum = x + y + carry
 	// The sum will overflow if both top bits are set (x & y) or if one of them
 	// is (x | y), and a carry from the lower place happened. If such a carry
@@ -421,12 +783,12 @@ func Add64(x, y, carry uint64) (sum, carryOut uint64) {
 // The borrow input must be 0 or 1; otherwise the behavior is undefined.
 // The borrowOut output is guaranteed to be 0 or 1.
 // This function's execution time does not depend on the inputs.
-func Sub(x, y, borrow uint) (diff, borrowOut uint) {
+func (math *RMath) Sub(x, y, borrow uint) (diff, borrowOut uint) {
 	if UintSize == 32 {
-		d32, b32 := Sub32(uint32(x), uint32(y), uint32(borrow))
+		d32, b32 := math.Sub32(uint32(x), uint32(y), uint32(borrow))
 		return uint(d32), uint(b32)
 	}
-	d64, b64 := Sub64(uint64(x), uint64(y), uint64(borrow))
+	d64, b64 := math.Sub64(uint64(x), uint64(y), uint64(borrow))
 	return uint(d64), uint(b64)
 }
 // Sub32 returns the difference of x, y and borrow, diff = x - y - borrow.
@@ -434,7 +796,7 @@ func Sub(x, y, borrow uint) (diff, borrowOut uint) {
 // The borrowOut output is guaranteed to be 0 or 1.
 //
 // This function's execution time does not depend on the inputs.
-func Sub32(x, y, borrow uint32) (diff, borrowOut uint32) {
+func (math *RMath)Sub32(x, y, borrow uint32) (diff, borrowOut uint32) {
 	diff = x - y - borrow
 	// The difference will underflow if the top bit of x is not set and the top
 	// bit of y is set (^x & y) or if they are the same (^(x ^ y)) and a borrow
@@ -447,7 +809,7 @@ func Sub32(x, y, borrow uint32) (diff, borrowOut uint32) {
 // The borrow input must be 0 or 1; otherwise the behavior is undefined.
 // The borrowOut output is guaranteed to be 0 or 1.
 // This function's execution time does not depend on the inputs.
-func Sub64(x, y, borrow uint64) (diff, borrowOut uint64) {
+func (math *RMath) Sub64(x, y, borrow uint64) (diff, borrowOut uint64) {
 	diff = x - y - borrow
 	// See Sub32 for the bit logic.
 	borrowOut = ((^x & y) | (^(x ^ y) & diff)) >> 63
@@ -458,12 +820,12 @@ func Sub64(x, y, borrow uint64) (diff, borrowOut uint64) {
 // with the product bits' upper half returned in hi and the lower
 // half returned in lo.
 // This function's execution time does not depend on the inputs.
-func Mul(x, y uint) (hi, lo uint) {
+func (math *RMath) Mul(x, y uint) (hi, lo uint) {
 	if UintSize == 32 {
 		h, l := Mul32(uint32(x), uint32(y))
 		return uint(h), uint(l)
 	}
-	h, l := Mul64(uint64(x), uint64(y))
+	h, l := math.Mul64(uint64(x), uint64(y))
 	return uint(h), uint(l)
 }
 
@@ -473,12 +835,12 @@ func Mul32(x, y uint32) (hi, lo uint32) {
 	return
 }
 
-func Div(hi, lo, y uint) (quo, rem uint) {
+func (math *RMath) Div(hi, lo, y uint) (quo, rem uint) {
 	if UintSize == 32 {
-		q, r := Div32(uint32(hi), uint32(lo), uint32(y))
+		q, r := math.Div32(uint32(hi), uint32(lo), uint32(y))
 		return uint(q), uint(r)
 	}
-	q, r := Div64(uint64(hi), uint64(lo), uint64(y))
+	q, r := math.Div64(uint64(hi), uint64(lo), uint64(y))
 	return uint(q), uint(r)
 }
 
@@ -486,7 +848,7 @@ func Div(hi, lo, y uint) (quo, rem uint) {
 // quo = (hi, lo)/y, rem = (hi, lo)%y with the dividend bits' upper
 // half in parameter hi and the lower half in parameter lo.
 // Div32 panics for y == 0 (division by zero) or y <= hi (quotient overflow).
-func Div32(hi, lo, y uint32) (quo, rem uint32) {
+func (math *RMath) Div32(hi, lo, y uint32) (quo, rem uint32) {
 	if y != 0 && y <= hi {
 		panic(overflowError)
 	}
@@ -499,7 +861,7 @@ func Div32(hi, lo, y uint32) (quo, rem uint32) {
 // quo = (hi, lo)/y, rem = (hi, lo)%y with the dividend bits' upper
 // half in parameter hi and the lower half in parameter lo.
 // Div64 panics for y == 0 (division by zero) or y <= hi (quotient overflow).
-func Div64(hi, lo, y uint64) (quo, rem uint64) {
+func (math *RMath) Div64(hi, lo, y uint64) (quo, rem uint64) {
 	if y == 0 {
 		panic(divideError)
 	}
@@ -511,7 +873,7 @@ func Div64(hi, lo, y uint64) (quo, rem uint64) {
 		return lo / y, lo % y
 	}
 
-	s := uint(LeadingZeros64(y))
+	s := uint(math.LeadingZeros64(y))
 	y <<= s
 
 	const (
@@ -553,31 +915,31 @@ func Div64(hi, lo, y uint64) (quo, rem uint64) {
 // Rem returns the remainder of (hi, lo) divided by y. Rem panics for
 // y == 0 (division by zero) but, unlike Div, it doesn't panic on a
 // quotient overflow.
-func Rem(hi, lo, y uint) uint {
+func (math *RMath) Rem(hi, lo, y uint) uint {
 	if UintSize == 32 {
-		return uint(Rem32(uint32(hi), uint32(lo), uint32(y)))
+		return uint(math.Rem32(uint32(hi), uint32(lo), uint32(y)))
 	}
-	return uint(Rem64(uint64(hi), uint64(lo), uint64(y)))
+	return uint(math.Rem64(uint64(hi), uint64(lo), uint64(y)))
 }
 
 // Rem32 returns the remainder of (hi, lo) divided by y. Rem32 panics
 // for y == 0 (division by zero) but, unlike Div32, it doesn't panic
 // on a quotient overflow.
-func Rem32(hi, lo, y uint32) uint32 {
+func (math *RMath) Rem32(hi, lo, y uint32) uint32 {
 	return uint32((uint64(hi)<<32 | uint64(lo)) % uint64(y))
 }
 
 // Rem64 returns the remainder of (hi, lo) divided by y. Rem64 panics
 // for y == 0 (division by zero) but, unlike Div64, it doesn't panic
 // on a quotient overflow.
-func Rem64(hi, lo, y uint64) uint64 {
+func (math *RMath) Rem64(hi, lo, y uint64) uint64 {
 	// We scale down hi so that hi < y, then use Div64 to compute the
 	// rem with the guarantee that it won't panic on quotient overflow.
 	// Given that
 	//   hi ≡ hi%y    (mod y)
 	// we have
 	//   hi<<64 + lo ≡ (hi%y)<<64 + lo    (mod y)
-	_, rem := Div64(hi%y, lo, y)
+	_, rem := math.Div64(hi%y, lo, y)
 	return rem
 }
 
@@ -586,94 +948,9 @@ var overflowError error
 
 //go:linkname divideError runtime.divideError
 var divideError error
-type RMath struct {
-}
 
-const haveArchTan = false
-var _tanP = [...]float64{
-	-1.30936939181383777646e4, // 0xc0c992d8d24f3f38
-	1.15351664838587416140e6,  // 0x413199eca5fc9ddd
-	-1.79565251976484877988e7, // 0xc1711fead3299176
-}
-var _tanQ = [...]float64{
-	1.00000000000000000000e0,
-	1.36812963470692954678e4,  // 0x40cab8a5eeb36572
-	-1.32089234440210967447e6, // 0xc13427bc582abc96
-	2.50083801823357915839e7,  // 0x4177d98fc2ead8ef
-	-5.38695755929454629881e7, // 0xc189afe03cbe5a31
-}
-const haveArchLog1p = false
-var mPi4 = [...]uint64{
-	0x0000000000000001,
-	0x45f306dc9c882a53,
-	0xf84eafa3ea69bb81,
-	0xb6c52b3278872083,
-	0xfca2c757bd778ac3,
-	0x6e48dc74849ba5c0,
-	0x0c925dd413a32439,
-	0xfc3bd63962534e7d,
-	0xd1046bea5d768909,
-	0xd338e04d68befc82,
-	0x7323ac7306a673e9,
-	0x3908bf177bf25076,
-	0x3ff12fffbc0b301f,
-	0xde5e2316b414da3e,
-	0xda6cfd9e4f96136e,
-	0x9e8c7ecd3cbfd45a,
-	0xea4f758fd7cbe2f6,
-	0x7a0e73ef14a525d4,
-	0xd7f6bf623f1aba10,
-	0xac06608df8f6d757,
-}
-var _sin = [...]float64{
-	1.58962301576546568060e-10, // 0x3de5d8fd1fd19ccd
-	-2.50507477628578072866e-8, // 0xbe5ae5e5a9291f5d
-	2.75573136213857245213e-6,  // 0x3ec71de3567d48a1
-	-1.98412698295895385996e-4, // 0xbf2a01a019bfdf03
-	8.33333333332211858878e-3,  // 0x3f8111111110f7d0
-	-1.66666666666666307295e-1, // 0xbfc5555555555548
-}
 
-// cos coefficients
-var _cos = [...]float64{
-	-1.13585365213876817300e-11, // 0xbda8fa49a0861a9b
-	2.08757008419747316778e-9,   // 0x3e21ee9d7b4e3f05
-	-2.75573141792967388112e-7,  // 0xbe927e4f7eac4bc6
-	2.48015872888517045348e-5,   // 0x3efa01a019c844f5
-	-1.38888888888730564116e-3,  // 0xbf56c16c16c14f91
-	4.16666666666665929218e-2,   // 0x3fa555555555554b
-}
 
-const (
-	haveArchAcos = false
-	haveArchSin = false
-	reduceThreshold = 1 << 29
-	haveArchAsinh = false
-	uvnan    = 0x7FF8000000000001
-	uvinf    = 0x7FF0000000000000
-	uvneginf = 0xFFF0000000000000
-	uvone    = 0x3FF0000000000000
-	mask     = 0x7FF
-	shift    = 64 - 11 - 1
-	bias     = 1023
-	signMask = 1 << 63
-	fracMask = 1<<shift - 1
-	MaxFloat32             = 0x1p127 * (1 + (1 - 0x1p-23)) 
-	SmallestNonzeroFloat32 = 0x1p-126 * 0x1p-23            
-	E   = 2.71828182845904523536028747135266249775724709369995957496696763 
-	Pi  = 3.14159265358979323846264338327950288419716939937510582097494459 
-	Phi = 1.61803398874989484820458683436563811772030917980576286213544862 
-	Sqrt2   = 1.41421356237309504880168872420969807856967187537694807317667974 // https://oeis.org/A002193
-	SqrtE   = 1.64872127070012814684865078781416357165377610071014801157507931 // https://oeis.org/A019774
-	SqrtPi  = 1.77245385090551602729816748334114518279754945612238712821380779 // https://oeis.org/A002161
-	SqrtPhi = 1.27201964951406896425242246173749149171560804184009624861664038 // https://oeis.org/A139339
-	Ln2    = 0.693147180559945309417232121458176568075500134360255254120680009 // https://oeis.org/A002162
-	Log2E  = 1 / Ln2
-	Ln10   = 2.30258509299404568401799145468436420760110148862877297603332790 // https://oeis.org/A002392
-	Log10E = 1 / Ln10
-	MaxFloat64             = 0x1p1023 * (1 + (1 - 0x1p-52)) // 1.79769313486231570814527423731704356798070e+308
-	SmallestNonzeroFloat64 = 0x1p-1022 * 0x1p-52            // 4.9406564584124654417656879286822137236505980e-324
-)
 // find even or odd
 func (math *RMath) IsEvenOdd(input int) bool {
 	// 1-true->even
@@ -807,12 +1084,12 @@ func (math *RMath) Fact(input int) int {
 func (math *RMath) Imod(num int, num2 int) int {
 	return num % num2
 }
-func Float64frombits(b uint64) float64 { return *(*float64)(unsafe.Pointer(&b)) }
-func Float64bits(f float64) uint64     { return *(*uint64)(unsafe.Pointer(&f)) }
+func (math *RMath)Float64frombits(b uint64) float64 { return *(*float64)(unsafe.Pointer(&b)) }
+func (math *RMath)Float64bits(f float64) uint64     { return *(*uint64)(unsafe.Pointer(&f)) }
 
 // Abs
 func (math *RMath) Abs(input float64) float64 {
-	return Float64frombits(Float64bits(input) &^ (1 << 63))
+	return math.Float64frombits(math.Float64bits(input) &^ (1 << 63))
 }
 
 // sqrt
@@ -949,7 +1226,7 @@ func (math *RMath) ISLittleNum(input []int) int {
 }
 
 // reverse of mum + sum + count of nums +avarage
-func (math *RMath) Reverse(input int) (sum int, count int, ave float64) {
+func (math *RMath) Reverser(input int) (sum int, count int, ave float64) {
 	var reverse int
 	sum = 0
 	for i := 0; input > 0; i++ {
@@ -987,33 +1264,18 @@ func (math *RMath)Inf(sign int) float64 {
 	} else {
 		v = uvneginf
 	}
-	return Float64frombits(v)
+	return math.Float64frombits(v)
 }
 func (math *RMath)log1p(x float64) float64 {
-	const (
-		Sqrt2M1     = 4.142135623730950488017e-01  // Sqrt(2)-1 = 0x3fda827999fcef34
-		Sqrt2HalfM1 = -2.928932188134524755992e-01 // Sqrt(2)/2-1 = 0xbfd2bec333018866
-		Small       = 1.0 / (1 << 29)              // 2**-29 = 0x3e20000000000000
-		Tiny        = 1.0 / (1 << 54)              // 2**-54
-		Two53       = 1 << 53                      // 2**53
-		Ln2Hi       = 6.93147180369123816490e-01   // 3fe62e42fee00000
-		Ln2Lo       = 1.90821492927058770002e-10   // 3dea39ef35793c76
-		Lp1         = 6.666666666666735130e-01     // 3FE5555555555593
-		Lp2         = 3.999999999940941908e-01     // 3FD999999997FA04
-		Lp3         = 2.857142874366239149e-01     // 3FD2492494229359
-		Lp4         = 2.222219843214978396e-01     // 3FCC71C51D8E78AF
-		Lp5         = 1.818357216161805012e-01     // 3FC7466496CB03DE
-		Lp6         = 1.531383769920937332e-01     // 3FC39A09D078C69F
-		Lp7         = 1.479819860511658591e-01     // 3FC2F112DF3E5244
-	)
+
 
 	// special cases
 	switch {
-	case x < -1 || IsNaN(x): // includes -Inf
-		return NaN()
+	case x < -1 || math.IsNaN(x): // includes -Inf
+		return math.NaN()
 	case x == -1:
 		return math.Inf(-1)
-	case IsInf(x, 1):
+	case math.IsInf(x, 1):
 		return math.Inf(1)
 	}
 
@@ -1041,7 +1303,7 @@ func (math *RMath)log1p(x float64) float64 {
 		var u float64
 		if absx < Two53 { // 1<<53
 			u = 1.0 + x
-			iu = Float64bits(u)
+			iu = math.Float64bits(u)
 			k = int((iu >> 52) - 1023)
 			// correction term
 			if k > 0 {
@@ -1052,16 +1314,16 @@ func (math *RMath)log1p(x float64) float64 {
 			c /= u
 		} else {
 			u = x
-			iu = Float64bits(u)
+			iu = math.Float64bits(u)
 			k = int((iu >> 52) - 1023)
 			c = 0
 		}
 		iu &= 0x000fffffffffffff
 		if iu < 0x0006a09e667f3bcd { // mantissa of Sqrt(2)
-			u = Float64frombits(iu | 0x3ff0000000000000) // normalize u
+			u = math.Float64frombits(iu | 0x3ff0000000000000) // normalize u
 		} else {
 			k++
-			u = Float64frombits(iu | 0x3fe0000000000000) // normalize u/2
+			u = math.Float64frombits(iu | 0x3fe0000000000000) // normalize u/2
 			iu = (0x0010000000000000 - iu) >> 2
 		}
 		f = u - 1.0 // Sqrt(2)/2 < u < Sqrt(2)
@@ -1091,7 +1353,7 @@ func (math *RMath)log1p(x float64) float64 {
 	return float64(k)*Ln2Hi - ((hfsq - (s*(hfsq+R) + (float64(k)*Ln2Lo + c))) - f)
 }
 
-func Mul64(x, y uint64) (hi, lo uint64) {
+func (math *RMath) Mul64(x, y uint64) (hi, lo uint64) {
 	const mask32 = 1<<32 - 1
 	x0 := x & mask32
 	x1 := x >> 32
@@ -1107,19 +1369,19 @@ func Mul64(x, y uint64) (hi, lo uint64) {
 	return
 }
 
-func archSin(x float64) float64 {
+func (math *RMath) archSin(x float64) float64 {
 
 	panic("not implemented")
 }
 func (math *RMath) archAcos(x float64) float64 {
 	panic("not implemented")
 }
-func trigReduce(x float64) (j uint64, z float64) {
+func (math *RMath)trigReduce(x float64) (j uint64, z float64) {
 	const PI4 = Pi / 4
 	if x < PI4 {
 		return 0, x
 	}
-	ix := Float64bits(x)
+	ix := math.Float64bits(x)
 	exp := int(ix>>shift&mask) - bias - shift
 	ix &^= mask << shift
 	ix |= 1 << shift
@@ -1127,19 +1389,19 @@ func trigReduce(x float64) (j uint64, z float64) {
 	z0 := (mPi4[digit] << bitshift) | (mPi4[digit+1] >> (64 - bitshift))
 	z1 := (mPi4[digit+1] << bitshift) | (mPi4[digit+2] >> (64 - bitshift))
 	z2 := (mPi4[digit+2] << bitshift) | (mPi4[digit+3] >> (64 - bitshift))
-	z2hi, _ := Mul64(z2, ix)
-	z1hi, z1lo := Mul64(z1, ix)
+	z2hi, _ := math.Mul64(z2, ix)
+	z1hi, z1lo := math.Mul64(z1, ix)
 	z0lo := z0 * ix
-	lo, c :=Add64(z1lo, z2hi, 0)
-	hi, _ := Add64(z0lo, z1hi, c)
+	lo, c :=math.Add64(z1lo, z2hi, 0)
+	hi, _ := math.Add64(z0lo, z1hi, c)
 	j = hi >> 61
 	hi = hi<<3 | lo>>61
-	lz := uint(LeadingZeros64(hi))
+	lz := uint(math.LeadingZeros64(hi))
 	e := uint64(bias - (lz + 1))
 	hi = (hi << (lz + 1)) | (lo >> (64 - (lz + 1)))
 	hi >>= 64 - shift
 	hi |= e << shift
-	z = Float64frombits(hi)
+	z = math.Float64frombits(hi)
 	if j&1 == 1 {
 		j++
 		j &= 7
@@ -1147,17 +1409,17 @@ func trigReduce(x float64) (j uint64, z float64) {
 	}
 	return j, z * PI4
 }
-func NaN() float64 { return Float64frombits(uvnan) }
+func (math *RMath) NaN() float64 { return math.Float64frombits(uvnan) }
 
 func(math *RMath)Cos(input float64) float64 {
 
 	return math.cos(input)
 }
 
-func IsNaN(f float64) (is bool) {
+func (math *RMath)IsNaN(f float64) (is bool) {
 	return f != f
 }
-func IsInf(f float64, sign int) bool {
+func (math *RMath) IsInf(f float64, sign int) bool {
 	return sign >= 0 && f > MaxFloat64 || sign <= 0 && f < -MaxFloat64
 }
 func (math *RMath)cos(x float64) float64 {
@@ -1168,8 +1430,8 @@ func (math *RMath)cos(x float64) float64 {
 	)
 	// special cases
 	switch {
-	case IsNaN(x) || IsInf(x, 0):
-		return NaN()
+	case math.IsNaN(x) || math.IsInf(x, 0):
+		return math.NaN()
 	}
 
 	// make argument positive
@@ -1179,7 +1441,7 @@ func (math *RMath)cos(x float64) float64 {
 	var j uint64
 	var y, z float64
 	if x >= reduceThreshold {
-		j, z = trigReduce(x)
+		j, z = math.trigReduce(x)
 	} else {
 		j = uint64(x * (4 / Pi)) // integer part of x/(Pi/4), as integer for tests on the phase angle
 		y = float64(j)           // integer part of x/(Pi/4), as float
@@ -1222,12 +1484,12 @@ func (math *RMath)cos(x float64) float64 {
 //	Sin(NaN) = NaN
 func (math *RMath) Sin(x float64) float64 {
 	if haveArchSin {
-		return archSin(x)
+		return math.archSin(x)
 	}
-	return sin(x)
+	return math.sin(x)
 }
 
-func sin(x float64) float64 {
+func (math *RMath)sin(x float64) float64 {
 	const (
 		PI4A = 7.85398125648498535156e-1  // 0x3fe921fb40000000, Pi/4 split into three parts
 		PI4B = 3.77489470793079817668e-8  // 0x3e64442d00000000,
@@ -1235,10 +1497,10 @@ func sin(x float64) float64 {
 	)
 	// special cases
 	switch {
-	case x == 0 || IsNaN(x):
+	case x == 0 || math.IsNaN(x):
 		return x // return ±0 || NaN()
-	case IsInf(x, 0):
-		return NaN()
+	case math.IsInf(x, 0):
+		return math.NaN()
 	}
 
 	// make argument positive but save the sign
@@ -1251,7 +1513,7 @@ func sin(x float64) float64 {
 	var j uint64
 	var y, z float64
 	if x >= reduceThreshold {
-		j, z = trigReduce(x)
+		j, z = math.trigReduce(x)
 	} else {
 		j = uint64(x * (4 / Pi)) // integer part of x/(Pi/4), as integer for tests on the phase angle
 		y = float64(j)           // integer part of x/(Pi/4), as float
@@ -1280,7 +1542,7 @@ func sin(x float64) float64 {
 	}
 	return y
 }
-func (math*RMath)llog1p(x float64) float64 {
+func (math *RMath)llog1p(x float64) float64 {
 	const (
 		Sqrt2M1     = 4.142135623730950488017e-01  // Sqrt(2)-1 = 0x3fda827999fcef34
 		Sqrt2HalfM1 = -2.928932188134524755992e-01 // Sqrt(2)/2-1 = 0xbfd2bec333018866
@@ -1300,11 +1562,11 @@ func (math*RMath)llog1p(x float64) float64 {
 
 	// special cases
 	switch {
-	case x < -1 || IsNaN(x): // includes -Inf
-		return NaN()
+	case x < -1 || math.IsNaN(x): // includes -Inf
+		return math.NaN()
 	case x == -1:
 		return math.Inf(-1)
-	case IsInf(x, 1):
+	case math.IsInf(x, 1):
 		return math.Inf(1)
 	}
 
@@ -1332,7 +1594,7 @@ func (math*RMath)llog1p(x float64) float64 {
 		var u float64
 		if absx < Two53 { // 1<<53
 			u = 1.0 + x
-			iu = Float64bits(u)
+			iu = math.Float64bits(u)
 			k = int((iu >> 52) - 1023)
 			// correction term
 			if k > 0 {
@@ -1343,16 +1605,16 @@ func (math*RMath)llog1p(x float64) float64 {
 			c /= u
 		} else {
 			u = x
-			iu = Float64bits(u)
+			iu = math.Float64bits(u)
 			k = int((iu >> 52) - 1023)
 			c = 0
 		}
 		iu &= 0x000fffffffffffff
 		if iu < 0x0006a09e667f3bcd { // mantissa of Sqrt(2)
-			u = Float64frombits(iu | 0x3ff0000000000000) // normalize u
+			u = math.Float64frombits(iu | 0x3ff0000000000000) // normalize u
 		} else {
 			k++
-			u = Float64frombits(iu | 0x3fe0000000000000) // normalize u/2
+			u = math.Float64frombits(iu | 0x3fe0000000000000) // normalize u/2
 			iu = (0x0010000000000000 - iu) >> 2
 		}
 		f = u - 1.0 // Sqrt(2)/2 < u < Sqrt(2)
@@ -1396,8 +1658,8 @@ func(math *RMath) acosh(x float64) float64 {
 	const Large = 1 << 28 // 2**28
 	// first case is special case
 	switch {
-	case x < 1 || IsNaN(x):
-		return NaN()
+	case x < 1 || math.IsNaN(x):
+		return math.NaN()
 	case x == 1:
 		return 0
 	case x >= Large:
@@ -1408,7 +1670,7 @@ func(math *RMath) acosh(x float64) float64 {
 	t := x - 1
 	return math.Log1p(t + math.Sqrt(2*t+t*t)) // 2 >= x > 1
 }
-func xatan(x float64) float64 {
+func (math *RMath) xatan(x float64) float64 {
 	const (
 		P0 = -8.750608600031904122785e-01
 		P1 = -1.615753718733365076637e+01
@@ -1427,46 +1689,46 @@ func xatan(x float64) float64 {
 	return z
 }
 
-func satan(x float64) float64 {
+func (math *RMath)satan(x float64) float64 {
 	const (
 		Morebits = 6.123233995736765886130e-17 
 		Tan3pio8 = 2.41421356237309504880      
 	)
 	if x <= 0.66 {
-		return xatan(x)
+		return math.xatan(x)
 	}
 	if x > Tan3pio8 {
-		return Pi/2 - xatan(1/x) + Morebits
+		return Pi/2 - math.xatan(1/x) + Morebits
 	}
-	return Pi/4 + xatan((x-1)/(x+1)) + 0.5*Morebits
+	return Pi/4 + math.xatan((x-1)/(x+1)) + 0.5*Morebits
 }
 
 //arctan
 func(math *RMath) Atan(x float64) float64 {
 
-	return atan(x)
+	return math.atan(x)
 }
 //arctan
-func atan(x float64) float64 {
+func (math *RMath) atan(x float64) float64 {
 	if x == 0 {
-		return x
+	  return x
 	}
 	if x > 0 {
-		return satan(x)
+	  return math.satan(x)
 	}
-	return -satan(-x)
-}
-func archTan(x float64) float64 {
+	return -(math.satan(-x))
+  }
+func (math *RMath) archTan(x float64) float64 {
 	panic("not implemented")
 }
 //tan
 func (math *RMath) Tan(x float64) float64 {
 	if haveArchTan {
-		return archTan(x)
+		return math.archTan(x)
 	}
-	return tan(x)
+	return math.tan(x)
 }
-func tan(x float64) float64 {
+func (math *RMath) tan(x float64) float64 {
 	const (
 		PI4A = 7.85398125648498535156e-1  // 0x3fe921fb40000000, Pi/4 split into three parts
 		PI4B = 3.77489470793079817668e-8  // 0x3e64442d00000000,
@@ -1474,10 +1736,10 @@ func tan(x float64) float64 {
 	)
 	// special cases
 	switch {
-	case x == 0 || IsNaN(x):
+	case x == 0 || math.IsNaN(x):
 		return x // return ±0 || NaN()
-	case IsInf(x, 0):
-		return NaN()
+	case math.IsInf(x, 0):
+		return math.NaN()
 	}
 
 	// make argument positive but save the sign
@@ -1489,7 +1751,7 @@ func tan(x float64) float64 {
 	var j uint64
 	var y, z float64
 	if x >= reduceThreshold {
-		j, z = trigReduce(x)
+		j, z = math.trigReduce(x)
 	} else {
 		j = uint64(x * (4 / Pi)) // integer part of x/(Pi/4), as integer for tests on the phase angle
 		y = float64(j)           // integer part of x/(Pi/4), as float
