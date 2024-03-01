@@ -9,10 +9,8 @@ import (
 )
 
 type RMath struct {
+	
 }
-
-const haveArchTan = false
-
 var _tanP = [...]float64{
 	-1.30936939181383777646e4, // 0xc0c992d8d24f3f38
 	1.15351664838587416140e6,  // 0x413199eca5fc9ddd
@@ -25,9 +23,6 @@ var _tanQ = [...]float64{
 	2.50083801823357915839e7,  // 0x4177d98fc2ead8ef
 	-5.38695755929454629881e7, // 0xc189afe03cbe5a31
 }
-
-const haveArchLog1p = false
-
 var mPi4 = [...]uint64{
 	0x0000000000000001,
 	0x45f306dc9c882a53,
@@ -70,6 +65,8 @@ var _cos = [...]float64{
 }
 
 const (
+	haveArchTan = false
+	haveArchLog1p = false
 	haveArchAcos           = false
 	haveArchSin            = false
 	reduceThreshold        = 1 << 29
@@ -98,8 +95,6 @@ const (
 	Log10E                 = 1 / Ln10
 	MaxFloat64             = 0x1p1023 * (1 + (1 - 0x1p-52)) // 1.79769313486231570814527423731704356798070e+308
 	SmallestNonzeroFloat64 = 0x1p-1022 * 0x1p-52            // 4.9406564584124654417656879286822137236505980e-324
-)
-const (
 	Sqrt2M1     = 4.142135623730950488017e-01  // Sqrt(2)-1 = 0x3fda827999fcef34
 	Sqrt2HalfM1 = -2.928932188134524755992e-01 // Sqrt(2)/2-1 = 0xbfd2bec333018866
 	Small       = 1.0 / (1 << 29)              // 2**-29 = 0x3e20000000000000
@@ -114,12 +109,14 @@ const (
 	Lp5         = 1.818357216161805012e-01     // 3FC7466496CB03DE
 	Lp6         = 1.531383769920937332e-01     // 3FC39A09D078C69F
 	Lp7         = 1.479819860511658591e-01     // 3FC2F112DF3E5244
+	m0 = 0x5555555555555555 // 01010101 ...
+	m1 = 0x3333333333333333 // 00110011 ...
+	m2 = 0x0f0f0f0f0f0f0f0f // 00001111 ...
+	m3 = 0x00ff00ff00ff00ff // etc.
+	m4 = 0x0000ffff0000ffff
+	deBruijn32 = 0x077CB531
+	deBruijn64 = 0x03f79d71b4ca8b09
 )
-const m0 = 0x5555555555555555 // 01010101 ...
-const m1 = 0x3333333333333333 // 00110011 ...
-const m2 = 0x0f0f0f0f0f0f0f0f // 00001111 ...
-const m3 = 0x00ff00ff00ff00ff // etc.
-const m4 = 0x0000ffff0000ffff
 const ntz8tab = "" +
 	"\x08\x00\x01\x00\x02\x00\x01\x00\x03\x00\x01\x00\x02\x00\x01\x00" +
 	"\x04\x00\x01\x00\x02\x00\x01\x00\x03\x00\x01\x00\x02\x00\x01\x00" +
@@ -203,6 +200,7 @@ type IntegerType int
 
 // Pointer represents a pointer to an arbitrary type. There are four special operations
 type Pointer *ArbitraryType
+
 // UintSize is the size of a uint in bits.
 const UintSize = uintSize
 
@@ -226,15 +224,10 @@ func (math *RMath) LeadingZeros64(x uint64) int { return 64 - math.Len64(x) }
 // --- TrailingZeros ---
 
 // See http://supertech.csail.mit.edu/papers/debruijn.pdf
-const deBruijn32 = 0x077CB531
-
 var deBruijn32tab = [32]byte{
 	0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
 	31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9,
 }
-
-const deBruijn64 = 0x03f79d71b4ca8b09
-
 var deBruijn64tab = [64]byte{
 	0, 1, 56, 2, 57, 49, 28, 3, 61, 58, 42, 50, 38, 29, 17, 4,
 	62, 47, 59, 36, 45, 43, 51, 22, 53, 39, 33, 30, 24, 18, 12, 5,
